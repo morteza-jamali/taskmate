@@ -6,12 +6,12 @@ import type { CSSInterpolation } from '@emotion/serialize';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
-const inputStyles = css`
+const getInputStyles = ({ error }: Pick<DatePickerInputProps, 'error'>) => css`
   background-color: var(--black-1);
   color: var(--text-color-1);
   outline: none;
   border-radius: 8px;
-  border: 1px solid var(--black-4);
+  border: 1px solid ${error ? 'var(--red-1)' : 'var(--black-4)'};
   height: 36px;
   font-weight: 400;
   font-size: 14px;
@@ -20,9 +20,10 @@ const inputStyles = css`
   margin: 5px 0;
   width: 100%;
 
-  &:focus {
+  ${!error &&
+  `&:focus {
     border-color: var(--blue-1);
-  }
+  }`}
 `;
 
 const calendarStyles = (
@@ -79,23 +80,28 @@ const calendarStyles = (
 `;
 
 export interface DatePickerInputProps
-  extends Pick<InputWrapperProps, 'label'>,
-    Pick<ComponentProps<'input'>, 'name'> {}
+  extends Pick<InputWrapperProps, 'label' | 'error'>,
+    Pick<ComponentProps<'input'>, 'name' | 'className'> {}
 
-export const DatePickerInput: FC<DatePickerInputProps> = ({ label, name }) => {
+export const DatePickerInput: FC<DatePickerInputProps> = ({
+  label,
+  error,
+  className,
+  ...props
+}) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
 
   return (
-    <InputWrapper {...{ label }} gap={0}>
+    <InputWrapper {...{ label, className, error }} gap={0}>
       <ClassNames>
         {({ css }) => (
           <DatePicker
             isClearable
             selected={selectedDate}
             onChange={(date: Date | null) => setSelectedDate(date)}
-            css={inputStyles}
+            css={getInputStyles({ error })}
             popperClassName={calendarStyles(css)}
-            {...{ name }}
+            {...props}
           />
         )}
       </ClassNames>

@@ -31,6 +31,8 @@ export const router = createBrowserRouter([
           Component: async () =>
             (await import('./pages/dashboard/tasks/NewTask')).NewTask,
         },
+        action: async (props) =>
+          (await import('./pages/dashboard/tasks/NewTask')).formAction(props),
       },
       // {
       //   path: 'login',

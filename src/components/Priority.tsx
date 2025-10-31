@@ -52,7 +52,7 @@ type PriorityTypes = 'extreme' | 'moderate' | 'low';
 
 export interface PriorityProps
   extends Pick<ComponentProps<'input'>, 'name'>,
-    Pick<InputWrapperProps, 'label'> {
+    Pick<InputWrapperProps, 'label' | 'error'> {
   defaultValue?: PriorityTypes;
   onChange?: (priority: PriorityTypes | null) => void;
 }
@@ -61,6 +61,7 @@ export const Priority: React.FC<PriorityProps> = ({
   defaultValue,
   onChange = () => {},
   name,
+  error,
   label,
 }) => {
   const [priority, setPriority] = useState<PriorityTypes | null>(
@@ -77,7 +78,7 @@ export const Priority: React.FC<PriorityProps> = ({
   }, [priority]);
 
   return (
-    <InputWrapper {...{ label }} gap={5}>
+    <InputWrapper {...{ label, error }} gap={5}>
       <Flex alignItems="center" gap={30}>
         <input
           type="hidden"
@@ -86,7 +87,7 @@ export const Priority: React.FC<PriorityProps> = ({
         />
         <PriorityItem
           label="Extreme"
-          dotColor="#fa5252"
+          dotColor="var(--red-1)"
           checked={priority === 'extreme'}
           onChange={(checked) => onChangeHandler(checked, 'extreme')}
         />

@@ -11,7 +11,7 @@ const GridRoot = styled.div<Required<Pick<GridProps, 'gap'>>>`
   --grid-gap: ${(props) => `calc(${`${props.gap}px`} / 2)`};
   display: flex;
   flex-wrap: wrap;
-  margin: calc(var(--grid-gap) * -1);
+  margin: 0 calc(var(--grid-gap) * -1);
 `;
 
 export function Grid({ children, gap = 0 }: GridProps): ReactNode {

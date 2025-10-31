@@ -3,14 +3,19 @@ import { useDropzone } from 'react-dropzone';
 import { AnimatePresence, motion } from 'motion/react';
 import Image from './Image';
 import { css } from '@emotion/react';
+import { InputWrapper, type InputWrapperProps } from './InputWrapper';
 
 import PhotoImg from '@/src/assets/photo.svg?react';
 
-export interface ImageDropzoneProps {
+export interface ImageDropzoneProps
+  extends Pick<InputWrapperProps, 'label' | 'error'> {
   hint?: string;
+  name?: string;
 }
 
-const presentationStyles = css`
+const getPresentationStyles = ({
+  error,
+}: Pick<ImageDropzoneProps, 'error'>) => css`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -20,6 +25,7 @@ const presentationStyles = css`
   padding: 50px;
   cursor: pointer;
   transition: all 0.2s;
+  ${error && 'border: 1px solid var(--red-1);'}
 
   &:hover {
     background-color: var(--black-5);
@@ -34,6 +40,11 @@ const presentationStyles = css`
 
 const thumbImgStyles = css`
   object-fit: cover;
+  position: absolute;
+  inset: 0;
+  width: 90%;
+  height: 90%;
+  margin: auto;
 `;
 
 const thumbRootStyles = css`
@@ -54,7 +65,7 @@ const thumbRootStyles = css`
 `;
 
 const removeBtnStyles = css`
-  background-color: #fa5252;
+  background-color: var(--red-1);
   z-index: 1;
   border: none;
   width: 20px;
@@ -106,9 +117,14 @@ const thumbsContainerStyles = css`
   margin-top: 16px;
 `;
 
-type NewFileType = File & { preview: string };
+type NewFileType = File & Record<'preview' | 'dataUrl' | 'path', string>;
 
-export const ImageDropzone: React.FC<ImageDropzoneProps> = ({ hint }) => {
+export const ImageDropzone: React.FC<ImageDropzoneProps> = ({
+  hint,
+  name,
+  label,
+  error,
+}) => {
   const [files, setFiles] = useState<NewFileType[]>([]);
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
@@ -116,11 +132,19 @@ export const ImageDropzone: React.FC<ImageDropzoneProps> = ({ hint }) => {
     },
     onDrop: (acceptedFiles) => {
       setFiles(
-        acceptedFiles.map((file) =>
-          Object.assign(file, {
+        acceptedFiles.map((file) => {
+          const newFile = Object.assign(file, {
             preview: URL.createObjectURL(file),
-          }),
-        ),
+            dataUrl: '',
+          });
+          const reader = new FileReader();
+          reader.onloadend = function () {
+            newFile.dataUrl = reader.result as string;
+          };
+          reader.readAsDataURL(acceptedFiles[0]);
+
+          return newFile as unknown as NewFileType;
+        }),
       );
     },
   });
@@ -154,19 +178,42 @@ export const ImageDropzone: React.FC<ImageDropzoneProps> = ({ hint }) => {
   }, [files]);
 
   return (
-    <section>
-      <div {...getRootProps()} css={presentationStyles}>
-        <input {...getInputProps()} />
-        <PhotoImg />
-        <div css={imageDropzoneTextStyles}>
-          <p>Drag images here or click to select files</p>
-          {hint && <p>{hint}</p>}
+    <InputWrapper {...{ label, error }}>
+      <section>
+        <input
+          type="hidden"
+          {...{ name }}
+          defaultValue={
+            files.length === 0
+              ? ''
+              : JSON.stringify(
+                  files.map((file) => ({
+                    dataUrl: file.dataUrl,
+                    path: file.path,
+                  })),
+                )
+          }
+        />
+        <div {...getRootProps()} css={getPresentationStyles({ error })}>
+          <input {...getInputProps()} />
+          <PhotoImg />
+          <div css={imageDropzoneTextStyles}>
+            <p>Drag images here or click to select files</p>
+            {hint && <p>{hint}</p>}
+          </div>
         </div>
-      </div>
-      <aside css={thumbsContainerStyles}>
-        <AnimatePresence initial={false}>{thumbs}</AnimatePresence>
-      </aside>
-    </section>
+        <aside
+          css={[
+            thumbsContainerStyles,
+            css`
+              ${thumbs.length === 0 && 'margin: 0;'}
+            `,
+          ]}
+        >
+          <AnimatePresence initial={false}>{thumbs}</AnimatePresence>
+        </aside>
+      </section>
+    </InputWrapper>
   );
 };
 
