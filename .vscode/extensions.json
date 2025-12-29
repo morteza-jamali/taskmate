@@ -2,7 +2,6 @@
   "recommendations": [
     "esbenp.prettier-vscode",
     "editorconfig.editorconfig",
-    "gruntfuggly.todo-tree",
-    "styled-components.vscode-styled-components"
+    "gruntfuggly.todo-tree"
   ]
 }
