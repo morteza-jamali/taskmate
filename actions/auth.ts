@@ -1,3 +1,4 @@
+import { authClient } from '@/lib/auth-client';
 import * as z from 'zod';
 
 const RegisterFormSchema = z.object({
@@ -38,7 +39,14 @@ type FormState =
     }
   | undefined;
 
+const messages: Record<string, string> = {
+  USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL: 'email',
+};
+
 export async function register(state: FormState, formData: FormData) {
+  let errors:
+    | Record<string, string | string[]>
+    | NonNullable<FormState>['errors'] = {};
   const data = {
     firstName: formData.get('firstName'),
     lastName: formData.get('lastName'),
@@ -50,11 +58,26 @@ export async function register(state: FormState, formData: FormData) {
 
   // If any form fields are invalid, return early
   if (!validatedFields.success) {
+    errors = z.flattenError(validatedFields.error).fieldErrors;
+
     return {
-      errors: z.flattenError(validatedFields.error).fieldErrors,
+      errors,
       data,
     };
   }
 
-  // Call the provider or db to create a user...
+  const { error: err } = await authClient.signUp.email({
+    email: data.email as string,
+    password: data.password as string,
+    name: `${data.firstName} ${data.lastName}`,
+  });
+
+  if (!!err) {
+    errors = { [messages[err.code!]]: err.message };
+  }
+
+  return {
+    errors,
+    data,
+  };
 }
