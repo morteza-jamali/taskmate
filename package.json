@@ -8,15 +8,21 @@
     "start": "next start",
     "lint": "eslint",
     "postinstall": "husky",
-    "prepare": "husky"
+    "prepare": "husky",
+    "db:migrate": "drizzle-kit migrate",
+    "db:generate": "npx @better-auth/cli generate --output database/schema/auth.schema.ts --yes && npx drizzle-kit generate"
   },
   "dependencies": {
     "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@libsql/client": "^0.15.15",
     "@mui/icons-material": "^7.3.6",
     "@mui/material": "^7.3.6",
     "@mui/material-nextjs": "^7.3.6",
+    "better-auth": "^1.4.10",
+    "dotenv": "^17.2.3",
+    "drizzle-orm": "^0.45.1",
     "motion": "^12.23.26",
     "next": "16.0.10",
     "react": "19.2.1",
@@ -24,16 +30,19 @@
     "zod": "^4.2.1"
   },
   "devDependencies": {
+    "@better-auth/cli": "^1.4.10",
     "@commitlint/cli": "^20.2.0",
     "@commitlint/config-conventional": "^20.2.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.8",
     "eslint": "^9",
     "eslint-config-next": "16.0.10",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "prettier": "^3.7.4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   },
   "lint-staged": {

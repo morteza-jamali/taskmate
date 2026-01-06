@@ -2,6 +2,8 @@
   "recommendations": [
     "esbenp.prettier-vscode",
     "editorconfig.editorconfig",
-    "gruntfuggly.todo-tree"
+    "gruntfuggly.todo-tree",
+    "mtxr.sqltools-driver-sqlite",
+    "mtxr.sqltools"
   ]
 }
